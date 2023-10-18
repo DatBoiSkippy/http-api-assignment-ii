@@ -10,11 +10,13 @@ const urlStruct = {
     GET: {
         '/': htmlHandler.getIndex,
         '/style.css': htmlHandler.getCSS,
-        '/getUsers': jsonHandler.getUsers,
+        '/getAlcohol': jsonHandler.getRandomAlc,
+        '/getReviews': jsonHandler.getReviews,
         notFound: jsonHandler.notFound,
     },
     HEAD: {
-        '/getUsers': jsonHandler.getUsersMeta,
+        '/getAlcohol': jsonHandler.getRandomAlcMeta,
+        '/getReviews': jsonHandler.getReviewsMeta,
         notFound: jsonHandler.notFoundMeta,
     },
 }
@@ -24,12 +26,13 @@ const parseBody = (request, response, handler) => {
     const body = [];
 
     request.on('error', (err) => {
-        console.dir(err);
+        F
         response.statusCode = 400;
         response.end();
     });
 
     request.on('data', (chunk) => {
+
         body.push(chunk);
     })
 
@@ -41,16 +44,19 @@ const parseBody = (request, response, handler) => {
     });
 };
 
+//Handles post requests, only two currently
 const handlePost = (request, response, parsedUrl) => {
-    if(parsedUrl.pathname === '/addUser') {
-        parseBody(request, response, jsonHandler.addUser)
+    if (parsedUrl.pathname === '/searchAlcohol') {
+        parseBody(request, response, jsonHandler.searchAlc);
+    }
+    if (parsedUrl.pathname === '/setReview') {
+        parseBody(request, response, jsonHandler.setReview);
     }
 }
 const onRequest = (request, response) => {
     const parsedUrl = url.parse(request.url);
-    console.log(request.method);
 
-    if(request.method === 'POST') {
+    if (request.method === 'POST') {
         return handlePost(request, response, parsedUrl);
     }
     else if (urlStruct[request.method][parsedUrl.pathname]) {
